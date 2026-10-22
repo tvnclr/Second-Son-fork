@@ -14,4 +14,13 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
+  <!-- The game's own icon, made from the player's dump (sce_sys\icon0.png). publish.ps1 copies it here
+       from the play folder; it is game art, so it stays out of the repository (.gitignore). -->
+  <PropertyGroup Condition="Exists('app.ico')">
+    <ApplicationIcon>app.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup Condition="Exists('app.ico')">
+    <Resource Include="app.ico" />
+  </ItemGroup>
+
 </Project>
