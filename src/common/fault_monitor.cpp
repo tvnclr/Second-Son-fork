@@ -18,6 +18,9 @@
 
 #if defined(__LLVM_INSTR_PROFILE_GENERATE)
 #include <profile/instr_prof_interface.h>
+// In the profile runtime (compiler-rt InstrProfiling.h) but not in the public header: writes the
+// counters to the current file name and, unlike __llvm_profile_dump, keeps later writes enabled.
+extern "C" int __llvm_profile_write_file(void);
 #endif
 
 #include <immintrin.h>
@@ -1476,6 +1479,15 @@ void ReportLoop() {
     bool pgo_reset = false;
     bool pgo_dumped = false;
     double pgo_reset_elapsed = 0.0;
+    // SHADPS4_PGO_SESSION=1 (2026-10-22, tvnclr fork): train on the whole session instead of a
+    // two-minute window. After the same reset the counters go to pgo-session-<pid>.profraw next to
+    // the EXE every minute (no %m in the name: each write replaces the file with the running
+    // total, and the exit writes the last one). One file per play session; llvm-profdata merges.
+    const bool pgo_session = [] {
+        const char* value = std::getenv("SHADPS4_PGO_SESSION");
+        return value && value[0] == '1';
+    }();
+    double pgo_last_write = 0.0;
 #endif
 
     while (true) {
@@ -1627,9 +1639,19 @@ void ReportLoop() {
             __llvm_profile_reset_counters();
             pgo_reset = true;
             pgo_reset_elapsed = elapsed;
-            LOG_INFO(Render, "PGO: counters reset at t={:.1f}s draws/frame={:.0f}", elapsed,
-                     draws_per_frame);
-        } else if (pgo_reset && !pgo_dumped && elapsed - pgo_reset_elapsed >= 120.0) {
+            pgo_last_write = elapsed;
+            if (pgo_session) {
+                __llvm_profile_set_filename("pgo-session-%p.profraw");
+            }
+            LOG_INFO(Render, "PGO: counters reset at t={:.1f}s draws/frame={:.0f}{}", elapsed,
+                     draws_per_frame, pgo_session ? " (session mode)" : "");
+        } else if (pgo_session && pgo_reset && elapsed - pgo_last_write >= 60.0) {
+            const int write_result = __llvm_profile_write_file();
+            pgo_last_write = elapsed;
+            LOG_INFO(Render, "PGO: session profile written at t={:.1f}s ({:.0f}s of play) rc={}",
+                     elapsed, elapsed - pgo_reset_elapsed, write_result);
+        } else if (!pgo_session && pgo_reset && !pgo_dumped &&
+                   elapsed - pgo_reset_elapsed >= 120.0) {
             const int dump_result = __llvm_profile_dump();
             pgo_dumped = true;
             LOG_INFO(Render, "PGO: profile dumped at t={:.1f}s reset={:.1f}s rc={}", elapsed,
