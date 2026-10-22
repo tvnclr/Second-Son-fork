@@ -37,9 +37,13 @@ struct ShaderIndex {
 /// v1.0.2: when only some files differ (a player's dump with extra or other files), the shaders of
 /// the unchanged files are kept and only the new / changed files are read. `progress(done, total)`
 /// (bytes) is called on the calling thread about every 100 ms while files are read.
+/// `update_folder` (2026-10-22, tvnclr fork): the game's -UPDATE / -patch folder, empty for none.
+/// Its files replace the base game's of the same path, as the game reads them (fs.cpp overlay): the
+/// update re-ships the shader packs, so a base-only index misses every shader of the seed.
 ShaderIndex BuildShaderIndex(const std::filesystem::path& game_folder,
                              const std::filesystem::path& index_file,
-                             const std::function<void(u64, u64)>& progress = {});
+                             const std::function<void(u64, u64)>& progress = {},
+                             const std::filesystem::path& update_folder = {});
 
 /// HeapCompact of the process heap (Windows; no-op elsewhere): coalesces the free blocks a burst of
 /// boot threads left behind (2026-10-16: after the 16-thread rebuild pre-pass, freeing the A2

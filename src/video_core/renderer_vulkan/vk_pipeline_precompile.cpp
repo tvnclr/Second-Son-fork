@@ -57,6 +57,7 @@
 #include "common/logging/log.h"
 #include "common/serdes.h"
 #include "core/emulator_settings.h"
+#include "core/file_sys/fs.h"
 #include "shader_recompiler/backend/spirv/emit_spirv.h"
 #include "shader_recompiler/frontend/decode.h"
 #include "shader_recompiler/frontend/fetch_shader.h"
@@ -719,6 +720,22 @@ struct RealPerm {
     bool full{};   // every guest buffer non-empty at the dispatch it was made for
 };
 
+/// The update folder the game runs with, the way fs.cpp mounts it (-UPDATE first, then -patch);
+/// empty when there is none or updates are ignored (--ignore-game-patch).
+std::filesystem::path GameUpdateFolder(const std::filesystem::path& game_folder) {
+    if (Core::FileSys::MntPoints::ignore_game_patches) {
+        return {};
+    }
+    std::error_code ec;
+    for (const std::string_view suffix : {"-UPDATE", "-patch"}) {
+        auto folder = Core::FileSys::OverlayPath(game_folder, suffix);
+        if (std::filesystem::is_directory(folder, ec)) {
+            return folder;
+        }
+    }
+    return {};
+}
+
 /// The game folder's shader index, built (or read from the cache folder's shader-index.bin) once
 /// per launch on first use; ExtractEntry::index points into it.
 const VideoCore::ShaderIndex& GameShaderIndex() {
@@ -729,15 +746,16 @@ const VideoCore::ShaderIndex& GameShaderIndex() {
         // v1.0.2: the scan reports progress on the boot screen (it sat frozen at 15% on a
         // player's first start until they closed it, PERF-PLAN 14.1); main thread only.
         const bool main_thread = SDL_IsMainThread();
+        const auto game_folder = Common::ElfInfo::Instance().GetGameFolder();
         index = VideoCore::BuildShaderIndex(
-            Common::ElfInfo::Instance().GetGameFolder(),
-            Storage::DataBase::Instance().SidecarPath("shader-index.bin"),
+            game_folder, Storage::DataBase::Instance().SidecarPath("shader-index.bin"),
             [main_thread](u64 done, u64 total) {
                 if (main_thread) {
                     ShowBootProgress("Reading the game's shader files (first start), MB",
                                      done >> 20, total >> 20, true, 0.15f);
                 }
-            });
+            },
+            GameUpdateFolder(game_folder));
     }
     return index;
 }

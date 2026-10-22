@@ -17,6 +17,7 @@
 #include <fstream>
 #include <mutex>
 #include <thread>
+#include <unordered_set>
 
 #include "common/logging/log.h"
 #include "video_core/shader_scan.h"
@@ -281,18 +282,56 @@ bool LoadIndex(const std::filesystem::path& path, const std::filesystem::path& f
     return true;
 }
 
+/// The base game's files with the update's laid over them: an update file replaces the base file
+/// of the same relative path, the update's new files are added. Saved indexes keep these paths
+/// relative to the game folder ("../CUSA00004-patch/..."), which stays the same between starts.
+std::vector<FileEntry> ListGameFiles(const std::filesystem::path& game_folder,
+                                     const std::filesystem::path& update_folder, Fingerprint& fp) {
+    auto files = ListFiles(game_folder, fp);
+    std::error_code ec;
+    if (update_folder.empty() || !std::filesystem::is_directory(update_folder, ec)) {
+        return files;
+    }
+    Fingerprint update_fp{};
+    auto update_files = ListFiles(update_folder, update_fp);
+    std::unordered_set<std::u8string> replaced;
+    for (const auto& file : update_files) {
+        replaced.insert(file.path.lexically_relative(update_folder).generic_u8string());
+    }
+    const size_t num_replaced = std::erase_if(files, [&](const FileEntry& file) {
+        if (!replaced.contains(file.path.lexically_relative(game_folder).generic_u8string())) {
+            return false;
+        }
+        --fp.files;
+        fp.bytes -= file.size;
+        return true;
+    });
+    fp.files += update_fp.files;
+    fp.bytes += update_fp.bytes;
+    fp.newest = std::max(fp.newest, update_fp.newest);
+    files.insert(files.end(), std::make_move_iterator(update_files.begin()),
+                 std::make_move_iterator(update_files.end()));
+    std::ranges::sort(files, {}, &FileEntry::path);
+    LOG_INFO(Render_Vulkan,
+             "ShaderScan: update {} laid over the game folder ({} files replaced, {} added, {} "
+             "files in all)",
+             update_folder.string(), num_replaced, replaced.size() - num_replaced, files.size());
+    return files;
+}
+
 } // Anonymous namespace
 
 ShaderIndex BuildShaderIndex(const std::filesystem::path& game_folder,
                              const std::filesystem::path& index_file,
-                             const std::function<void(u64, u64)>& progress) {
+                             const std::function<void(u64, u64)>& progress,
+                             const std::filesystem::path& update_folder) {
     using Clock = std::chrono::steady_clock;
     const auto t0 = Clock::now();
     auto ms = [&] {
         return std::chrono::duration<double, std::milli>(Clock::now() - t0).count();
     };
     Fingerprint fp{};
-    const auto files = ListFiles(game_folder, fp);
+    const auto files = ListGameFiles(game_folder, update_folder, fp);
     ShaderIndex index;
     for (const auto& file : files) {
         index.files.push_back(file.path);
