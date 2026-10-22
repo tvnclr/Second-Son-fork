@@ -28,6 +28,11 @@ Windows 10 / 11, one zip of about 74 MB. **You need your own copy of the game** 
 
 </div>
 
+> [!IMPORTANT]
+> **This is tvnclr's fork** (branch `second-son-dev`) of axylpup's build. It adds a fix for hitches at scene changes
+> when the update sits in its own folder, a desktop launcher and an own-PGO workflow: see **[FORK.md](../FORK.md)**.
+> Everything below is the upstream page; downloads and releases are axylpup's.
+
 > [!NOTE]
 > Unofficial and experimental. Not affiliated with Sony Interactive Entertainment, Sucker Punch Productions or the
 > shadPS4 team. Tested with the EU version (CUSA00004, update 1.07); the US version (CUSA00223) gets the same
