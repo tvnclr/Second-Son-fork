@@ -2,7 +2,7 @@
 SPDX-FileCopyrightText: 2026 tvnclr
 SPDX-License-Identifier: GPL-2.0-or-later
 
-The README of tvnclr's fork (branch second-son-dev). The upstream front page stays in .github/README.md.
+The front page of github.com/tvnclr/shadPS4 (branch second-son-dev). axylpup's original front page is .github/UPSTREAM.md.
 -->
 
 <div align="center">
@@ -15,7 +15,7 @@ Smooth scene changes with a self-built EXE, a desktop launcher, and a PGO workfl
 
 [![Branch](https://img.shields.io/badge/branch-second--son--dev-e0452b?style=for-the-badge)](https://github.com/tvnclr/shadPS4/tree/second-son-dev)
 [![Based on](https://img.shields.io/badge/based%20on-second--son%20v1.1-555?style=for-the-badge)](https://github.com/axylpup/shadPS4/releases/tag/second-son-v1.1)
-[![License](https://img.shields.io/badge/license-GPL--2.0--or--later-555?style=for-the-badge)](LICENSE)
+[![License](https://img.shields.io/badge/license-GPL--2.0--or--later-555?style=for-the-badge)](../LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%20%2F%2011-555?style=for-the-badge)](#building)
 
 **[What's new](#whats-new) · [Results](#results) · [Launcher](#secondsonlauncher) · [Building](#building) ·
@@ -31,14 +31,14 @@ Smooth scene changes with a self-built EXE, a desktop launcher, and a PGO workfl
 ## What's new
 
 Everything else is axylpup's v1.1: features, controls, DLSS and the FAQ are on the
-[upstream front page](.github/README.md).
+[upstream front page](UPSTREAM.md).
 
 | Change | What it does | Where |
 |---|---|---|
 | **Shader index reads the update** | The index of the game's shader code now lays the update folder (`CUSA00004-patch` / `-UPDATE`) over the base game, as the game itself reads them. Upstream read the base folder only, so with the update kept beside the game none of the prepared shaders were found and every shader compiled during play. | `src/video_core/shader_scan.cpp`, `renderer_vulkan/vk_pipeline_precompile.cpp` |
 | **The release's shader cache with any EXE** | `SHADPS4_SEED_ANY_BUILD=1` lets an EXE compiled by someone else use the shader seed shipped with the release. Upstream accepts it only from the exact EXE that verified it. | `renderer_vulkan/vk_pipeline_serialization.cpp` |
 | **PGO training on a whole session** | `SHADPS4_PGO_SESSION=1` makes an instrumented build record the entire play session (written every minute) instead of one two-minute window. | `src/common/fault_monitor.cpp` |
-| **SecondSonLauncher** | A desktop launcher: Play, settings pages, game-file checks, save backups. | [`launcher/`](launcher/README.md) |
+| **SecondSonLauncher** | A desktop launcher: Play, settings pages, game-file checks, save backups. | [`launcher/`](../launcher/README.md) |
 | **Fixed test save** | One save to start every test from, so measurements compare like with like. | `scripts/test-save.ps1` |
 
 Both new flags are off by default: without them the fork behaves as upstream.
@@ -74,7 +74,7 @@ the emulator already reads at start (its own block in `shadps4-flags-user.txt`, 
 - **System**: graphics card, compatibility renderer, start the game directly (hold Shift for the launcher),
   shader cache, logs, desktop shortcut.
 
-Build and install it with `launcher\publish.ps1`; details in [launcher/README.md](launcher/README.md).
+Build and install it with `launcher\publish.ps1`; details in [launcher/README.md](../launcher/README.md).
 
 ## Building
 
@@ -140,10 +140,10 @@ Re-train after larger code changes: the profile follows the code it was recorded
 
 - **[axylpup](https://github.com/axylpup/shadPS4)**: the inFAMOUS Second Son build this fork is based on (v1.1),
   including the shader seed, the shader index, the PGO setup and everything on the
-  [upstream front page](.github/README.md).
+  [upstream front page](UPSTREAM.md).
 - **[shadPS4](https://github.com/shadps4-emu/shadPS4)** and its contributors: the emulator.
 - **[AzaharPlus](https://github.com/AzaharPlus/shadPS4Plus)**: PKG Extractor.
 - **NVIDIA**: Streamline and DLSS (not included; download them from NVIDIA).
 
-Licensed under the [GNU General Public License v2.0 or later](LICENSE), as upstream. inFAMOUS and Second Son are
+Licensed under the [GNU General Public License v2.0 or later](../LICENSE), as upstream. inFAMOUS and Second Son are
 trademarks of Sony Interactive Entertainment.

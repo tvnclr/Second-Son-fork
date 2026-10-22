@@ -4,7 +4,12 @@ SPDX-License-Identifier: GPL-2.0-or-later
 
 The front page of github.com/axylpup/shadPS4 (shown from .github/README.md on the default branch, second-son).
 GitHub shows .github/README.md before the root README.md, so upstream's README.md stays untouched.
+In tvnclr's fork the front page is this fork's own README; axylpup's page is kept here unchanged below the note.
 -->
+
+> [!NOTE]
+> **axylpup's original front page** of the build this fork is based on (v1.1), kept for reference. Downloads and
+> releases here are axylpup's. This fork's own page: **[README](README.md)**.
 
 <div align="center">
 
@@ -27,11 +32,6 @@ Windows 10 / 11, one zip of about 74 MB. **You need your own copy of the game** 
 <sub>Seattle rooftop on the test PC (i5-13600K + RTX 4070 Ti SUPER, 1080p). The counter shows that moment.</sub>
 
 </div>
-
-> [!IMPORTANT]
-> **This is tvnclr's fork** (branch `second-son-dev`) of axylpup's build. It adds a fix for hitches at scene changes
-> when the update sits in its own folder, a desktop launcher and an own-PGO workflow: see **[FORK.md](../FORK.md)**.
-> Everything below is the upstream page; downloads and releases are axylpup's.
 
 > [!NOTE]
 > Unofficial and experimental. Not affiliated with Sony Interactive Entertainment, Sucker Punch Productions or the
