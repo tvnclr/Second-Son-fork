@@ -1,0 +1,262 @@
+<UserControl x:Class="SecondSonLauncher.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="clr-namespace:SecondSonLauncher.Controls">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Section list -->
+        <Border Background="{StaticResource PanelBrush}" BorderBrush="{StaticResource DividerBrush}" BorderThickness="0,0,1,0">
+            <DockPanel Margin="24,30,24,22">
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="4,0,0,26">
+                    <TextBlock Text="INFAMOUS" Style="{StaticResource Kicker}" Foreground="{StaticResource TextBrush}" FontWeight="SemiBold"/>
+                    <TextBlock Text="  /  SETTINGS" Style="{StaticResource Kicker}"/>
+                </StackPanel>
+                <TextBlock DockPanel.Dock="Bottom" Foreground="{StaticResource FaintTextBrush}" FontSize="12" TextWrapping="Wrap" Margin="4,0"
+                           Text="Changes save as you make them. Most take effect the next time the game starts."/>
+                <ListBox ItemsSource="{Binding Sections}" SelectedValuePath="Key" SelectedValue="{Binding SectionKey}"
+                         Background="Transparent" BorderThickness="0" ItemContainerStyle="{StaticResource NavItem}"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <DockPanel>
+                                <TextBlock DockPanel.Dock="Left" Style="{StaticResource Icon}" Text="{Binding Icon}" Width="34"
+                                           Foreground="{StaticResource TextBrush}"/>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Title}" FontFamily="{StaticResource DisplayFont}" FontSize="17"
+                                               Foreground="{StaticResource TextBrush}"/>
+                                    <TextBlock Text="{Binding Subtitle}" FontSize="12" Foreground="{StaticResource SubTextBrush}" Margin="0,2,0,0"/>
+                                </StackPanel>
+                            </DockPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+        </Border>
+
+        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="52,34,52,40" MaxWidth="860" HorizontalAlignment="Left">
+                <TextBlock Text="{Binding CurrentSection.Title}" Style="{StaticResource PageTitle}"/>
+                <TextBlock Text="{Binding CurrentSection.Subtitle}" Foreground="{StaticResource SubTextBrush}" FontSize="14" Margin="0,4,0,0"/>
+
+                <!-- ============================== Visuals -->
+                <StackPanel Visibility="{Binding SectionKey, Converter={StaticResource EqualsToVis}, ConverterParameter=Visuals}">
+                    <TextBlock Text="DISPLAY" Style="{StaticResource GroupHeader}"/>
+                    <ui:SettingRow Title="Display mode" Description="Borderless covers the whole screen without changing the screen's mode.">
+                        <ComboBox ItemsSource="{Binding DisplayModes}" SelectedValuePath="Value" SelectedValue="{Binding DisplayMode}"/>
+                    </ui:SettingRow>
+                    <ui:SettingRow Title="Window size" Description="Used when the game runs in a window."
+                                   Visibility="{Binding IsWindowed, Converter={StaticResource TruthyToVis}}">
+                        <ComboBox ItemsSource="{Binding WindowSizes}" SelectedValuePath="Value" SelectedValue="{Binding WindowSize}"/>
+                    </ui:SettingRow>
+                    <ui:SettingRow Title="V-Sync" Description="Half refresh holds every picture two screen refreshes: even motion on screens without G-Sync / FreeSync (72 FPS on 144 Hz).">
+                        <ComboBox ItemsSource="{Binding PresentModes}" SelectedValuePath="Value" SelectedValue="{Binding PresentMode}"/>
+                    </ui:SettingRow>
+                    <ui:SettingRow Title="Frame-rate cap" Description="At most this many pictures per second.">
+                        <ComboBox ItemsSource="{Binding FrameCaps}" SelectedValuePath="Value" SelectedValue="{Binding FrameCap}"/>
+                    </ui:SettingRow>
+                    <ui:SettingRow Title="HDR output" Description="Only when HDR is on in Windows and the screen supports it.">
+                        <CheckBox Style="{StaticResource Toggle}" IsChecked="{Binding HdrAllowed}"/>
+                    </ui:SettingRow>
+
+                    <TextBlock Text="IMAGE" Style="{StaticResource GroupHeader}"/>
+                    <ui:SettingRow Title="Render size" Description="The size the game draws at, in percent of your monitor. The window size does not change it. Below 100% DLSS (or the normal scaler) brings the picture up to your screen; above 100% is sharper and slower. In game, Insert switches between your pick and 100%.">
+                        <ComboBox ItemsSource="{Binding RenderScales}" SelectedValuePath="Value" SelectedValue="{Binding RenderScale}" Width="380"
+                                  AutomationProperties.AutomationId="RenderSize"/>
+                    </ui:SettingRow>
+                    <ui:SettingRow Title="Screen shape" Description="Automatic fills any screen: wider shows more at the sides.">
+                        <ComboBox ItemsSource="{Binding Aspects}" SelectedValuePath="Value" SelectedValue="{Binding Aspect}"/>
+                    </ui:SettingRow>
+                    <ui:SettingRow Title="HUD position" Description="Where health and the minimap sit on wide screens.">
+                        <ComboBox ItemsSource="{Binding HudPositions}" SelectedValuePath="Value" SelectedValue="{Binding HudPosition}"/>
+                    </ui:SettingRow>
+                    <ui:SettingRow Title="Performance mode" Description="The game's own lower settings for weaker PCs (experimental).">
+                        <ComboBox ItemsSource="{Binding PerfModes}" SelectedValuePath="Value" SelectedValue="{Binding PerfMode}"/>
+                    </ui:SettingRow>
+
+                    <TextBlock Text="DLSS" Style="{StaticResource GroupHeader}"/>
+                    <Border Style="{StaticResource InfoBox}">
+                        <DockPanel>
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0,0,0">
+                                <Button Content="Check again" Command="{Binding RecheckDlssCommand}" Margin="0,0,8,0"/>
+                                <Button Content="Open dlss folder" Command="{Binding OpenDlssFolderCommand}" Margin="0,0,8,0"/>
+                                <Button Content="Download page" Command="{Binding OpenDlssDownloadCommand}"/>
+                            </StackPanel>
+                            <TextBlock Style="{StaticResource Icon}" Text="&#xE946;" Foreground="{Binding DlssStatusBrush}" Margin="0,0,12,0"
+                                       DockPanel.Dock="Left"/>
+                            <TextBlock Text="{Binding DlssStatus}" Foreground="{Binding DlssStatusBrush}" FontSize="13" TextWrapping="Wrap"
+                                       VerticalAlignment="Center"/>
+                        </DockPanel>
+                    </Border>
+                    <ui:SettingRow Title="DLSS" Description="NVIDIA RTX only. DLAA at the game's render size instead of the game's own anti-aliasing. In game: Home turns it on / off, Page Up opens the DLSS panel.">
+                        <CheckBox Style="{StaticResource Toggle}" IsChecked="{Binding DlssEnabled}"/>
+                    </ui:SettingRow>
+                    <ui:SettingRow Title="DLSS network" Description="L is the sharpest and costs the most GPU time.">
+                        <ComboBox ItemsSource="{Binding DlssPresets}" SelectedValuePath="Value" SelectedValue="{Binding DlssPreset}"
+                                  IsEnabled="{Binding DlssEnabled}"/>
+                    </ui:SettingRow>
+                    <ui:SettingRow Title="More sub-pixel positions" Description="8-64 positions instead of the game's 2: smoother edges.">
+                        <CheckBox Style="{StaticResource Toggle}" IsChecked="{Binding DlssHalton}" IsEnabled="{Binding DlssEnabled}"/>
+                    </ui:SettingRow>
+                </StackPanel>
+
+                <!-- ============================== Controls -->
+                <StackPanel Visibility="{Binding SectionKey, Converter={StaticResource EqualsToVis}, ConverterParameter=Controls}">
+                    <TextBlock Text="KEYBOARD AND MOUSE" Style="{StaticResource GroupHeader}"/>
+                    <ui:SettingRow Title="Mouse aiming" Description="Real mouse aiming with keyboard and mouse. Y turns it off for the session.">
+                        <CheckBox Style="{StaticResource Toggle}" IsChecked="{Binding MouseAim}"/>
+                    </ui:SettingRow>
+                    <ui:SettingRow Title="Fixed mouse speed" Description="Off: the - and = keys change the speed while you play and keep it. On: always the speed below.">
+                        <CheckBox Style="{StaticResource Toggle}" IsChecked="{Binding CustomMouseSpeed}" IsEnabled="{Binding MouseAim}"/>
+                    </ui:SettingRow>
+                    <ui:SettingRow Title="Mouse speed" Description="Degrees per 100 pixels of mouse movement (default 5.12)."
+                                   IsEnabled="{Binding CustomMouseSpeed}">
+                        <StackPanel Orientation="Horizontal">
+                            <Slider Minimum="1" Maximum="15" SmallChange="0.1" LargeChange="1" Value="{Binding MouseSpeed}"/>
+                            <TextBlock Style="{StaticResource ValueLabel}" Text="{Binding MouseSpeed, StringFormat={}{0:0.00}}"/>
+                        </StackPanel>
+                    </ui:SettingRow>
+                    <ui:SettingRow Title="Button icons" Description="The buttons the game shows: keyboard / mouse or controller, by what you used last.">
+                        <ComboBox ItemsSource="{Binding ButtonIconModes}" SelectedValuePath="Value" SelectedValue="{Binding ButtonIcons}"/>
+                    </ui:SettingRow>
+
+                    <TextBlock Text="CONTROLLER" Style="{StaticResource GroupHeader}"/>
+                    <ui:SettingRow Title="Left stick deadzone" Description="Bigger ignores more small movements (a drifting stick); 0 is off.">
+                        <StackPanel Orientation="Horizontal">
+                            <Slider Minimum="0" Maximum="30" SmallChange="0.5" LargeChange="2.5" Value="{Binding DeadzoneLeft}"/>
+                            <TextBlock Style="{StaticResource ValueLabel}" Text="{Binding DeadzoneLeft, StringFormat={}{0:0.0}%}"/>
+                        </StackPanel>
+                    </ui:SettingRow>
+                    <ui:SettingRow Title="Right stick deadzone">
+                        <StackPanel Orientation="Horizontal">
+                            <Slider Minimum="0" Maximum="30" SmallChange="0.5" LargeChange="2.5" Value="{Binding DeadzoneRight}"/>
+                            <TextBlock Style="{StaticResource ValueLabel}" Text="{Binding DeadzoneRight, StringFormat={}{0:0.0}%}"/>
+                        </StackPanel>
+                    </ui:SettingRow>
+                    <ui:SettingRow Title="Touchpad on pads without one" Description="Xbox and similar: D-pad up is the touchpad's left half, View / Back the right half.">
+                        <CheckBox Style="{StaticResource Toggle}" IsChecked="{Binding TouchpadHalves}"/>
+                    </ui:SettingRow>
+                    <ui:SettingRow Title="Motion sensor" Description="The DualShock 4 / DualSense gyro for the spray-can moments.">
+                        <CheckBox Style="{StaticResource Toggle}" IsChecked="{Binding MotionControls}"/>
+                    </ui:SettingRow>
+                    <ui:SettingRow Title="Controller speaker volume" Description="Sounds the PS4 plays on the controller (phone, spray can), from your PC speakers.">
+                        <StackPanel Orientation="Horizontal">
+                            <Slider Minimum="0" Maximum="200" SmallChange="5" LargeChange="25" Value="{Binding PadSpeakerVolume}"/>
+                            <TextBlock Style="{StaticResource ValueLabel}" Text="{Binding PadSpeakerVolume, StringFormat={}{0:0}%}"/>
+                        </StackPanel>
+                    </ui:SettingRow>
+                </StackPanel>
+
+                <!-- ============================== Game & Saves -->
+                <StackPanel Visibility="{Binding SectionKey, Converter={StaticResource EqualsToVis}, ConverterParameter=Game}">
+                    <TextBlock Text="GAME FILES" Style="{StaticResource GroupHeader}"/>
+                    <TextBlock Text="Game folder (contains eboot.bin)" FontSize="15" Margin="0,10,0,8"/>
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right" Content="Browse" Command="{Binding BrowseGameCommand}" Margin="10,0,0,0" Width="96"/>
+                        <TextBox Text="{Binding GameFolder, Mode=OneWay}" IsReadOnly="True"/>
+                    </DockPanel>
+                    <Border Style="{StaticResource InfoBox}">
+                        <StackPanel>
+                            <TextBlock Text="{Binding GameLine}" FontSize="13" Foreground="{StaticResource SubTextBrush}" Margin="0,0,0,8"/>
+                            <ItemsControl ItemsSource="{Binding Issues}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <DockPanel Margin="0,3">
+                                            <TextBlock DockPanel.Dock="Left" Style="{StaticResource Icon}" Text="{Binding Icon}" FontSize="14"
+                                                       Foreground="{Binding Brush}" Margin="0,1,10,0" VerticalAlignment="Top"/>
+                                            <TextBlock Text="{Binding Text}" Foreground="{Binding Brush}" FontSize="13" TextWrapping="Wrap"/>
+                                        </DockPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                        <Button Content="Check again" Command="{Binding CheckGameCommand}" Margin="0,0,8,0"/>
+                        <Button Content="Full check (every file)" Command="{Binding DeepCheckCommand}" Margin="0,0,8,0"/>
+                        <Button Content="Open game folder" Command="{Binding OpenGameFolderCommand}"/>
+                    </StackPanel>
+                    <TextBlock Text="{Binding DeepCheckText}" Foreground="{StaticResource SubTextBrush}" FontSize="13" Margin="0,8,0,0"
+                               TextWrapping="Wrap" Visibility="{Binding DeepCheckText, Converter={StaticResource TruthyToVis}}"/>
+
+                    <TextBlock Text="LANGUAGE AND SOUND" Style="{StaticResource GroupHeader}"/>
+                    <ui:SettingRow Title="Game language" Description="Text and voices. Your copy only has the languages it was sold with; if the game stays in English, try the other variant (for example Portuguese Brazil / Portugal).">
+                        <ComboBox ItemsSource="{Binding Languages}" SelectedValuePath="Value" SelectedValue="{Binding Language}"/>
+                    </ui:SettingRow>
+                    <ui:SettingRow Title="Volume">
+                        <StackPanel Orientation="Horizontal">
+                            <Slider Minimum="0" Maximum="100" SmallChange="1" LargeChange="10" Value="{Binding Volume}"/>
+                            <TextBlock Style="{StaticResource ValueLabel}" Text="{Binding Volume, StringFormat={}{0:0}%}"/>
+                        </StackPanel>
+                    </ui:SettingRow>
+
+                    <TextBlock Text="SAVES" Style="{StaticResource GroupHeader}"/>
+                    <ui:SettingRow Title="Back up saves before playing" Description="A copy of your saves each time you press Play; the last 10 are kept.">
+                        <CheckBox Style="{StaticResource Toggle}" IsChecked="{Binding BackupBeforePlay}"/>
+                    </ui:SettingRow>
+                    <ui:SettingRow Title="Backups" Description="Restoring backs up your current saves first.">
+                        <StackPanel Orientation="Horizontal">
+                            <ComboBox ItemsSource="{Binding Backups}" SelectedItem="{Binding SelectedBackup}" Width="210" Margin="0,0,8,0"/>
+                            <Button Content="Restore" Command="{Binding RestoreBackupCommand}" Margin="0,0,8,0"/>
+                            <Button Content="Back up now" Command="{Binding BackupNowCommand}"/>
+                        </StackPanel>
+                    </ui:SettingRow>
+                    <ui:SettingRow Title="Folders">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="Open saves" Command="{Binding OpenSavesCommand}" Margin="0,0,8,0"/>
+                            <Button Content="Open backups" Command="{Binding OpenBackupsCommand}"/>
+                        </StackPanel>
+                    </ui:SettingRow>
+                </StackPanel>
+
+                <!-- ============================== System -->
+                <StackPanel Visibility="{Binding SectionKey, Converter={StaticResource EqualsToVis}, ConverterParameter=System}">
+                    <TextBlock Text="GRAPHICS CARD AND RENDERER" Style="{StaticResource GroupHeader}"/>
+                    <ui:SettingRow Title="Graphics card" Description="Automatic picks a dedicated card before an integrated one.">
+                        <ComboBox ItemsSource="{Binding GpuChoices}" SelectedValuePath="Value" SelectedValue="{Binding GpuId}"/>
+                    </ui:SettingRow>
+                    <ui:SettingRow Title="Compatibility renderer" Description="The multithreaded renderer off: slower, but closest to standard shadPS4. Try it for crashes or wrong textures.">
+                        <CheckBox Style="{StaticResource Toggle}" IsChecked="{Binding CompatRenderer}"/>
+                    </ui:SettingRow>
+
+                    <TextBlock Text="LAUNCHER" Style="{StaticResource GroupHeader}"/>
+                    <ui:SettingRow Title="Start the game directly" Description="Opening the launcher starts the game; hold Shift or Ctrl to open the launcher instead.">
+                        <CheckBox Style="{StaticResource Toggle}" IsChecked="{Binding StartDirectly}"/>
+                    </ui:SettingRow>
+                    <ui:SettingRow Title="Close the launcher after Play">
+                        <CheckBox Style="{StaticResource Toggle}" IsChecked="{Binding CloseOnPlay}"/>
+                    </ui:SettingRow>
+                    <ui:SettingRow Title="Check for build updates" Description="The loading screen asks GitHub for the newest release of the build. Nothing is downloaded.">
+                        <CheckBox Style="{StaticResource Toggle}" IsChecked="{Binding UpdateCheck}"/>
+                    </ui:SettingRow>
+                    <ui:SettingRow Title="Desktop shortcut">
+                        <Button Content="Create shortcut" Command="{Binding DesktopShortcutCommand}"/>
+                    </ui:SettingRow>
+
+                    <TextBlock Text="MAINTENANCE" Style="{StaticResource GroupHeader}"/>
+                    <ui:SettingRow Title="Shader cache" Description="Delete the saved shaders if graphics look wrong after an update. The next start prepares them again.">
+                        <Button Content="Clear shader cache" Command="{Binding ClearShaderCacheCommand}"/>
+                    </ui:SettingRow>
+                    <ui:SettingRow Title="Logs" Description="Attach shad_log.txt and, after a crash, fatal.txt to bug reports.">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="Open logs" Command="{Binding OpenLogsCommand}" Margin="0,0,8,0"/>
+                            <Button Content="Crash report" Command="{Binding OpenCrashReportCommand}"/>
+                        </StackPanel>
+                    </ui:SettingRow>
+                    <ui:SettingRow Title="Files" Description="Your own flag lines go below the launcher's block in shadps4-flags-user.txt.">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="Edit flags file" Command="{Binding OpenFlagsFileCommand}" Margin="0,0,8,0"/>
+                            <Button Content="Open build folder" Command="{Binding OpenBuildFolderCommand}"/>
+                        </StackPanel>
+                    </ui:SettingRow>
+                </StackPanel>
+
+                <TextBlock Text="{Binding StatusMessage}" Foreground="{StaticResource SubTextBrush}" FontSize="13" Margin="0,24,0,0"
+                           TextWrapping="Wrap" Visibility="{Binding StatusMessage, Converter={StaticResource TruthyToVis}}"/>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

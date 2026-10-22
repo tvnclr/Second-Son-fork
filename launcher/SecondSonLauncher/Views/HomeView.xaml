@@ -1,0 +1,114 @@
+<UserControl x:Class="SecondSonLauncher.Views.HomeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid ClipToBounds="True">
+        <!-- The game's own artwork (sce_sys\pic1.png from the player's dump). -->
+        <Image Source="{Binding BackgroundImage}" Stretch="UniformToFill" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+        <Rectangle>
+            <Rectangle.Fill>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                    <GradientStop Color="#FF0E0F12" Offset="0"/>
+                    <GradientStop Color="#F20E0F12" Offset="0.36"/>
+                    <GradientStop Color="#A00E0F12" Offset="0.58"/>
+                    <GradientStop Color="#300E0F12" Offset="1"/>
+                </LinearGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+        <Rectangle Height="180" VerticalAlignment="Bottom">
+            <Rectangle.Fill>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#000E0F12" Offset="0"/>
+                    <GradientStop Color="#E00E0F12" Offset="1"/>
+                </LinearGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+
+        <Grid Margin="52,34,52,22" Width="540" HorizontalAlignment="Left">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <Border BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" Padding="0,0,0,14">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Ellipse Width="8" Height="8" Fill="{Binding StatusBrush}" Margin="0,0,8,0"/>
+                        <TextBlock Text="{Binding StatusText}" Foreground="{StaticResource SubTextBrush}" FontSize="13"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="INFAMOUS SECOND SON" Style="{StaticResource Kicker}" Foreground="{StaticResource TextBrush}"
+                                   FontWeight="SemiBold"/>
+                        <TextBlock Text="  /  LAUNCHER" Style="{StaticResource Kicker}"/>
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+
+            <StackPanel Grid.Row="1" Margin="0,30,0,0">
+                <TextBlock Text="{Binding Heading}" FontFamily="{StaticResource DisplayFont}" FontWeight="Light" FontSize="46"/>
+                <TextBlock Text="{Binding Summary}" FontSize="18" Margin="0,14,0,0" TextWrapping="Wrap"/>
+                <TextBlock Text="{Binding GameLine}" FontSize="13" Foreground="{StaticResource SubTextBrush}" Margin="0,6,0,0"/>
+
+                <Button Style="{StaticResource PrimaryButton}" Command="{Binding PlayCommand}" Margin="0,28,0,0"
+                        AutomationProperties.Name="{Binding PlayLabel}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Style="{StaticResource Icon}" Text="&#xE768;" FontSize="18" Margin="0,0,12,0"/>
+                        <TextBlock Text="{Binding PlayLabel}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+                <TextBlock Text="{Binding StatusMessage}" Foreground="{StaticResource SubTextBrush}" FontSize="13" Margin="0,10,0,0"
+                           TextWrapping="Wrap" Visibility="{Binding StatusMessage, Converter={StaticResource TruthyToVis}}"/>
+
+                <StackPanel Margin="0,26,0,0">
+                    <Button Style="{StaticResource CardButton}" Command="{Binding GoSettingsCommand}" CommandParameter="Visuals">
+                        <DockPanel>
+                            <TextBlock DockPanel.Dock="Left" Style="{StaticResource Icon}" Text="&#xE7F4;" Width="38"/>
+                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource Icon}" Text="&#xE76C;" FontSize="12"
+                                       Foreground="{StaticResource SubTextBrush}" Margin="14,0,0,0"/>
+                            <TextBlock DockPanel.Dock="Right" Text="{Binding VisualsCard}" Foreground="{StaticResource SubTextBrush}"
+                                       FontSize="13" VerticalAlignment="Center"/>
+                            <TextBlock Text="Visuals" FontFamily="{StaticResource DisplayFont}" FontSize="19" VerticalAlignment="Center"/>
+                        </DockPanel>
+                    </Button>
+                    <Button Style="{StaticResource CardButton}" Command="{Binding GoSettingsCommand}" CommandParameter="Controls">
+                        <DockPanel>
+                            <TextBlock DockPanel.Dock="Left" Style="{StaticResource Icon}" Text="&#xE7FC;" Width="38"/>
+                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource Icon}" Text="&#xE76C;" FontSize="12"
+                                       Foreground="{StaticResource SubTextBrush}" Margin="14,0,0,0"/>
+                            <TextBlock DockPanel.Dock="Right" Text="{Binding ControlsCard}" Foreground="{StaticResource SubTextBrush}"
+                                       FontSize="13" VerticalAlignment="Center"/>
+                            <TextBlock Text="Controls" FontFamily="{StaticResource DisplayFont}" FontSize="19" VerticalAlignment="Center"/>
+                        </DockPanel>
+                    </Button>
+                    <Button Style="{StaticResource CardButton}" Command="{Binding GoSettingsCommand}" CommandParameter="Game">
+                        <DockPanel>
+                            <TextBlock DockPanel.Dock="Left" Style="{StaticResource Icon}" Text="&#xE8B7;" Width="38"/>
+                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource Icon}" Text="&#xE76C;" FontSize="12"
+                                       Foreground="{StaticResource SubTextBrush}" Margin="14,0,0,0"/>
+                            <TextBlock DockPanel.Dock="Right" Text="{Binding GameCard}" Foreground="{StaticResource SubTextBrush}"
+                                       FontSize="13" VerticalAlignment="Center"/>
+                            <TextBlock Text="Game files &amp; saves" FontFamily="{StaticResource DisplayFont}" FontSize="19" VerticalAlignment="Center"/>
+                        </DockPanel>
+                    </Button>
+                    <Button Style="{StaticResource CardButton}" Command="{Binding GoSettingsCommand}" CommandParameter="System">
+                        <DockPanel>
+                            <TextBlock DockPanel.Dock="Left" Style="{StaticResource Icon}" Text="&#xE713;" Width="38"/>
+                            <TextBlock DockPanel.Dock="Right" Style="{StaticResource Icon}" Text="&#xE76C;" FontSize="12"
+                                       Foreground="{StaticResource SubTextBrush}" Margin="14,0,0,0"/>
+                            <TextBlock DockPanel.Dock="Right" Text="{Binding SystemCard}" Foreground="{StaticResource SubTextBrush}"
+                                       FontSize="13" VerticalAlignment="Center"/>
+                            <TextBlock Text="System" FontFamily="{StaticResource DisplayFont}" FontSize="19" VerticalAlignment="Center"/>
+                        </DockPanel>
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+
+            <Border Grid.Row="3" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0" Padding="0,12,0,0">
+                <TextBlock Foreground="{StaticResource FaintTextBrush}" FontSize="12" TextWrapping="Wrap"
+                           Text="Hold Shift while starting to open this launcher  ·  In game: F3 settings, Home DLSS on / off, Page Up DLSS panel"/>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>
