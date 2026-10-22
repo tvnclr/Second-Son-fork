@@ -358,6 +358,19 @@ int CacheRebuildMode() {
     return mode;
 }
 
+/// SHADPS4_SEED_ANY_BUILD=1 (2026-10-22, tvnclr fork): take the release's seed although this EXE is
+/// another build. A self-compiled EXE of the same source has another hash, so the stamp's build id
+/// never matches and the first play compiles every shader live (stutter at scene changes). The
+/// rebuild still translates with this build and checks each stage against the game file's crc32 +
+/// length; only use it with the source the seed was made for.
+bool SeedAnyBuild() {
+    static const bool on = [] {
+        const char* value = std::getenv("SHADPS4_SEED_ANY_BUILD");
+        return value && value[0] == '1';
+    }();
+    return on;
+}
+
 /// vs-formats.bin key: shader hashes have a zero upper half (measured), perm < 256.
 u64 VsFormatKey(u64 pgm_hash, size_t perm_idx) {
     return (pgm_hash << 8) | (perm_idx & 0xff);
@@ -902,11 +915,17 @@ void PipelineCache::ReadSeedStamp() {
                  elf.GameSerial(), elf.AppVer(), serial, app_ver, code_hash);
     }
     if (build != BuildId()) {
+        if (!SeedAnyBuild()) {
+            LOG_WARNING(Render,
+                        "CacheRebuild: the seed was verified with emulator build {}, this is {}: no "
+                        "stage is rebuilt (a =2 VERIFY run with this build writes a new stamp)",
+                        build, BuildId());
+            return;
+        }
         LOG_WARNING(Render,
-                    "CacheRebuild: the seed was verified with emulator build {}, this is {}: no "
-                    "stage is rebuilt (a =2 VERIFY run with this build writes a new stamp)",
+                    "CacheRebuild: the seed was verified with emulator build {}, this is {}; "
+                    "SHADPS4_SEED_ANY_BUILD=1 takes it anyway",
                     build, BuildId());
-        return;
     }
     Shader::Profile seed_profile{};
     const bool same_profile = profile_bytes.size() == sizeof(seed_profile) &&
